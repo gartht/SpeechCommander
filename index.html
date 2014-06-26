@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Speech Recognition</title>
+    <script src="SpeechCommander.js"></script>
+</head>
+<body>
+
+</body>
+<script>
+    window.SpeechCommander.callToAttention = "Dashboard";
+    window.SpeechCommander.addCommand(["open", "email"], function(){
+            var win = new Window("http://www.google.com", "_blank");
+        });
+    window.SpeechCommander.beginListening();
+</script>
+</html>
