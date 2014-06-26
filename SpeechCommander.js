@@ -15,12 +15,40 @@
     listener.continuous = true;
 
     listener.onresult = function(event){
-        alert('resultIndex: ' + event.resultIndex);
+        var currentIndex = event.resultIndex;
+        var transcript = event.results[currentIndex][0].transcript.trim();
+
+        console.log('resultIndex: ' + currentIndex);
+        console.log('transcript: ' + transcript);
+
+        var routeArray = transcript.toLowerCase().split(' ')
+
+        if(routeArray[0] == commandConfig.callToAttention.toLowerCase()){
+            console.log('SpeechCommander should do something.');
+            var currentRoute = commands[routeArray[1]];
+            var i = 2;
+            while(typeof currentRoute !== "function"){ // when the command is finally a function we execute that with the rest of the arguments as params
+                currentRoute = currentRoute[routeArray[i]];
+            }
+            if(typeof currentRoute !== "function") {
+                throw new Error("Not a valid route. Nothing to execute.");
+            }
+            //Need to decide here about passing in parameters. Would they be passed in split up, or concatenated?
+            currentRoute();
+        }
     };
 
-    listener.onerror = function(error){
-        alert('error: ' + error.error);
+    listener.onerror = function(SRerror){
+        console.log('SpeechCommander Error: ' + SRerror.error);
     };
+
+    listener.onend = function(){
+        console.log('The browser has ended speech recognition.');
+        isListening = false;
+        if(commandConfig.renewListening){
+            commandConfig.beginListening();
+        }
+    }
 
     var commands = {};
 
@@ -28,9 +56,15 @@
 
     var commandConfig = {
         callToAttention:'',
+        renewListening:false,
         addCommand:function(routeArray, callback){
             if((!routeArray instanceof Array) || routeArray.length < 1) return;
             if(typeof callback !=="function") return;
+
+            if (routeArray.length == 1){
+                commands[routeArray[0]] = callback;
+                return;
+            }
 
             if(!commands[routeArray[0]])commands[routeArray[0]] = {};
             var currentRoute = commands[routeArray[0]];
@@ -47,6 +81,12 @@
                 if(Object.keys(commands) < 1 || commandConfig.callToAttention === '') throw new Error('SpeechCommander has no commands available.');
                 listener.start();
                 isListening = true;
+            }
+        },
+        stopListening:function(){
+            if(isListening){
+                listener.stop();
+                isListening = false;
             }
         }
     };

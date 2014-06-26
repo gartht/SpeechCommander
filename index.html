@@ -3,16 +3,26 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Speech Recognition</title>
-    <script src="SpeechCommander.js"></script>
+    <script src="js/SpeechCommander.js"></script>
 </head>
 <body>
 
 </body>
 <script>
     window.SpeechCommander.callToAttention = "Dashboard";
-    window.SpeechCommander.addCommand(["open", "email"], function(){
-            var win = new Window("http://www.google.com", "_blank");
-        });
+    window.SpeechCommander.renewListening = true;
+    window.SpeechCommander.addCommand(["open"], function(destination){
+        switch(destination){
+            case 'email':
+                window.open("https://mail.google.com", "_blank");
+                break;
+            case 'twitter':
+                window.open("https://www.twitter.com", "_blank");
+                break;
+
+        }
+
+    });
     window.SpeechCommander.beginListening();
 </script>
 </html>
